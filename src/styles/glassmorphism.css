@@ -1,0 +1,110 @@
+/* Lumina Glassmorphism UI Engine */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.80);
+  --glass-bg-dark: rgba(15, 23, 42, 0.80);
+  --glass-blur: 10px;
+  --glass-border: 2px solid rgba(255, 255, 255, 0.30);
+  --glass-border-dark: 2px solid rgba(255, 255, 255, 0.15);
+  --glass-radius: 24px;
+  --glass-gradient-overlay: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.0) 100%);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.12), 0 2px 8px 0 rgba(0, 0, 0, 0.06);
+  --liquid-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --liquid-duration: 0.5s;
+}
+
+/* Core Glass Panel Base */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: var(--glass-border);
+  border-radius: var(--glass-radius);
+  box-shadow: var(--glass-shadow);
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--liquid-duration) var(--liquid-ease),
+              box-shadow var(--liquid-duration) var(--liquid-ease),
+              background var(--liquid-duration) var(--liquid-ease);
+}
+
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--glass-gradient-overlay);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Dark Theme Glass Panel */
+.dark .glass-panel {
+  background: var(--glass-bg-dark);
+  border: var(--glass-border-dark);
+}
+
+/* Glass Card Variant */
+.glass-card {
+  padding: 1.25rem;
+  border-radius: var(--glass-radius);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: all var(--liquid-duration) var(--liquid-ease);
+}
+
+/* Glass Input & Button Controls */
+.glass-button {
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s var(--liquid-ease);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.glass-button:active {
+  transform: scale(0.95) translateY(1px);
+}
+
+/* LOW-END HARDWARE OPTIMIZATION FALLBACK */
+/* When low-end mode is toggled or backdrop-filter is unsupported, disable heavy blur shaders */
+.low-end-mode .glass-panel,
+.low-end-mode .glass-card,
+.low-end-mode .glass-button,
+.low-end-mode .glass-sheet {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(248, 250, 252, 0.94) !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.low-end-mode.dark .glass-panel,
+.low-end-mode.dark .glass-card,
+.low-end-mode.dark .glass-button,
+.low-end-mode.dark .glass-sheet {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(51, 65, 85, 0.8) !important;
+}
+
+@supports not (backdrop-filter: blur(10px)) {
+  .glass-panel, .glass-card, .glass-button {
+    backdrop-filter: none;
+    background: rgba(255, 255, 255, 0.92);
+  }
+}
