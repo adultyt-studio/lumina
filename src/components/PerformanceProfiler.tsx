@@ -96,7 +96,7 @@ export const PerformanceProfiler: React.FC = () => {
 
             <div className="flex justify-between items-center text-slate-600">
               <span className="flex items-center gap-1 font-medium">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> Bundle Size (<200KB)
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> Bundle Size (&lt;200KB)
               </span>
               <span className="font-mono font-bold text-emerald-600">{metrics.bundleSizeKb} KB</span>
             </div>
