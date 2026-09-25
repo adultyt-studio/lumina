@@ -1,13 +1,15 @@
 /* Lumina Glassmorphism UI Engine */
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.80);
-  --glass-bg-dark: rgba(15, 23, 42, 0.80);
-  --glass-blur: 10px;
-  --glass-border: 2px solid rgba(255, 255, 255, 0.30);
-  --glass-border-dark: 2px solid rgba(255, 255, 255, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.22);
+  --glass-bg-hover: rgba(255, 255, 255, 0.32);
+  --glass-bg-dark: rgba(15, 23, 42, 0.45);
+  --glass-bg-dark-hover: rgba(15, 23, 42, 0.60);
+  --glass-blur: 12px;
+  --glass-border: 1px solid rgba(255, 255, 255, 0.35);
+  --glass-border-dark: 1px solid rgba(255, 255, 255, 0.18);
   --glass-radius: 24px;
-  --glass-gradient-overlay: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.0) 100%);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.12), 0 2px 8px 0 rgba(0, 0, 0, 0.06);
+  --glass-gradient-overlay: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 100%);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.14), inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
   --liquid-ease: cubic-bezier(0.215, 0.61, 0.355, 1);
   --liquid-duration: 0.5s;
 }
@@ -21,10 +23,11 @@
   border-radius: var(--glass-radius);
   box-shadow: var(--glass-shadow);
   position: relative;
-  overflow: hidden;
+  z-index: 1;
   transition: transform var(--liquid-duration) var(--liquid-ease),
               box-shadow var(--liquid-duration) var(--liquid-ease),
-              background var(--liquid-duration) var(--liquid-ease);
+              background var(--liquid-duration) var(--liquid-ease),
+              border-color var(--liquid-duration) var(--liquid-ease);
 }
 
 .glass-panel::before {
@@ -39,10 +42,20 @@
   border-radius: inherit;
 }
 
+.glass-panel:hover {
+  background: var(--glass-bg-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.45);
+}
+
 /* Dark Theme Glass Panel */
 .dark .glass-panel {
   background: var(--glass-bg-dark);
   border: var(--glass-border-dark);
+}
+
+.dark .glass-panel:hover {
+  background: var(--glass-bg-dark-hover);
 }
 
 /* Glass Card Variant */
@@ -57,12 +70,17 @@
   transition: all var(--liquid-duration) var(--liquid-ease);
 }
 
-/* Glass Input & Button Controls */
+.glass-card:hover {
+  background: var(--glass-bg-hover);
+  transform: translateY(-2px);
+}
+
+/* Glass Buttons & Inputs */
 .glass-button {
-  background: rgba(255, 255, 255, 0.70);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.30);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 16px;
   padding: 0.6rem 1.2rem;
   font-weight: 600;
@@ -77,16 +95,19 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+}
+
 .glass-button:active {
-  transform: scale(0.95) translateY(1px);
+  transform: scale(0.96) translateY(1px);
 }
 
 /* LOW-END HARDWARE OPTIMIZATION FALLBACK */
-/* When low-end mode is toggled or backdrop-filter is unsupported, disable heavy blur shaders */
 .low-end-mode .glass-panel,
 .low-end-mode .glass-card,
-.low-end-mode .glass-button,
-.low-end-mode .glass-sheet {
+.low-end-mode .glass-button {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: rgba(248, 250, 252, 0.94) !important;
@@ -96,8 +117,7 @@
 
 .low-end-mode.dark .glass-panel,
 .low-end-mode.dark .glass-card,
-.low-end-mode.dark .glass-button,
-.low-end-mode.dark .glass-sheet {
+.low-end-mode.dark .glass-button {
   background: rgba(15, 23, 42, 0.95) !important;
   border: 1px solid rgba(51, 65, 85, 0.8) !important;
 }
@@ -105,6 +125,6 @@
 @supports not (backdrop-filter: blur(10px)) {
   .glass-panel, .glass-card, .glass-button {
     backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.88);
   }
 }

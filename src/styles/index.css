@@ -7,7 +7,65 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
   }
+
+  .dark body {
+    background: linear-gradient(135deg, #090d16 0%, #1e1b4b 50%, #311042 100%);
+  }
+}
+
+/* Vibrant Ambient Background Orbs for Glass Depth */
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.65;
+  z-index: 0;
+  pointer-events: none;
+  animation: floatOrb 12s ease-in-out infinite alternate;
+}
+
+.orb-1 {
+  width: 380px;
+  height: 380px;
+  background: #ff4d4d;
+  top: 5%;
+  left: 10%;
+}
+
+.orb-2 {
+  width: 450px;
+  height: 450px;
+  background: #38bdf8;
+  bottom: 10%;
+  right: 8%;
+  animation-delay: -4s;
+}
+
+.orb-3 {
+  width: 320px;
+  height: 320px;
+  background: #a855f7;
+  top: 40%;
+  left: 45%;
+  animation-delay: -8s;
+}
+
+@keyframes floatOrb {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(30px, 40px) scale(1.1);
+  }
+}
+
+.low-end-mode .bg-orb {
+  animation: none !important;
+  filter: blur(40px) !important;
+  opacity: 0.3 !important;
 }

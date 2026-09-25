@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useLuminaStore, GlassNode } from '../store/useLuminaStore';
 import { Sparkles, Layers, Square, Type, CheckCircle2 } from 'lucide-react';
-import { WebPImage } from './WebPImage';
 
 export const GlassCanvas: React.FC = () => {
   const { nodes, selectedNodeId, selectNode, updateNode, zoom, isLowEndMode } =
@@ -37,13 +36,13 @@ export const GlassCanvas: React.FC = () => {
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onClick={() => selectNode(null)}
-      className="relative w-full h-[calc(100vh-4rem)] overflow-hidden bg-gradient-to-br from-slate-100 via-indigo-50/30 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/50 touch-none select-none"
+      className="relative w-full h-[calc(100vh-4rem)] overflow-hidden touch-none select-none"
     >
       {/* Background Dot Grid for Figma Canvas Feel */}
       <div
-        className="absolute inset-0 opacity-20 pointer-events-none"
+        className="absolute inset-0 opacity-25 pointer-events-none"
         style={{
-          backgroundImage: 'radial-gradient(#6366f1 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px)',
           backgroundSize: `${24 * zoom}px ${24 * zoom}px`,
         }}
       />
@@ -55,6 +54,7 @@ export const GlassCanvas: React.FC = () => {
       >
         {nodes.map((node) => {
           const isSelected = selectedNodeId === node.id;
+          const isLiquid = node.type === 'liquid';
 
           const dynamicStyle: React.CSSProperties = {
             position: 'absolute',
@@ -75,31 +75,32 @@ export const GlassCanvas: React.FC = () => {
               onPointerDown={(e) => handlePointerDown(e, node)}
               className={`
                 glass-panel p-4 cursor-grab active:cursor-grabbing liquid-interactive
-                ${isSelected ? 'ring-2 ring-indigo-600 ring-offset-2 shadow-2xl scale-[1.02]' : ''}
+                ${isLiquid && !isLowEndMode ? 'liquid-glass' : ''}
+                ${isSelected ? 'ring-2 ring-white/80 ring-offset-2 ring-offset-transparent shadow-2xl scale-[1.02]' : ''}
               `}
             >
               {/* Header Label */}
               <div className="flex items-center justify-between gap-2 mb-2 pointer-events-none">
-                <div className="flex items-center gap-1.5 font-bold text-xs text-slate-800 dark:text-white">
-                  {node.type === 'liquid' && <Sparkles className="w-3.5 h-3.5 text-indigo-600" />}
-                  {node.type === 'card' && <Square className="w-3.5 h-3.5 text-indigo-500" />}
-                  {node.type === 'frame' && <Layers className="w-3.5 h-3.5 text-slate-600" />}
-                  {node.type === 'text' && <Type className="w-3.5 h-3.5 text-indigo-600" />}
+                <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900 dark:text-white drop-shadow-sm">
+                  {node.type === 'liquid' && <Sparkles className="w-3.5 h-3.5 text-amber-300" />}
+                  {node.type === 'card' && <Square className="w-3.5 h-3.5 text-indigo-300" />}
+                  {node.type === 'frame' && <Layers className="w-3.5 h-3.5 text-slate-200" />}
+                  {node.type === 'text' && <Type className="w-3.5 h-3.5 text-pink-300" />}
                   <span>{node.name}</span>
                 </div>
-                {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600" />}
+                {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />}
               </div>
 
               {/* Node Body Content */}
-              <div className="text-xs text-slate-600 dark:text-slate-300 font-medium pointer-events-none">
+              <div className="text-xs text-slate-900 dark:text-white/90 font-semibold pointer-events-none drop-shadow-sm">
                 {node.content}
               </div>
 
-              {/* Sample WebP Image for Liquid Card */}
-              {node.type === 'liquid' && (
+              {/* Liquid Surface Refraction Card */}
+              {isLiquid && (
                 <div className="mt-3 pointer-events-none">
-                  <div className="h-14 rounded-xl bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-white/40 flex items-center justify-center">
-                    <span className="text-[10px] font-semibold text-indigo-900 dark:text-indigo-200">
+                  <div className="h-14 rounded-xl bg-gradient-to-r from-white/20 via-indigo-300/20 to-pink-300/20 border border-white/40 flex items-center justify-center backdrop-blur-md">
+                    <span className="text-[10px] font-bold text-white tracking-wide uppercase drop-shadow-sm">
                       Liquid Refraction Surface
                     </span>
                   </div>

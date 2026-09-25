@@ -13,9 +13,15 @@ export const App: React.FC = () => {
   const { isLowEndMode, darkMode } = useLuminaStore();
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'} ${isLowEndMode ? 'low-end-mode' : ''}`}>
+    <div className={`min-h-screen relative overflow-hidden ${darkMode ? 'dark bg-slate-950 text-white' : 'text-slate-900'} ${isLowEndMode ? 'low-end-mode' : ''}`}>
+      {/* Background Ambient Orbs for Glass Depth */}
+      <div className="bg-orb orb-1" />
+      <div className="bg-orb orb-2" />
+      <div className="bg-orb orb-3" />
+
+      {/* Glass UI Studio Elements */}
       <Header />
-      <main className="relative">
+      <main className="relative z-10">
         <PerformanceProfiler />
         <GlassInspector />
         <GlassCanvas />

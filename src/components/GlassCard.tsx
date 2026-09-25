@@ -6,6 +6,7 @@ interface GlassCardProps {
   onClick?: () => void;
   elevation?: number;
   interactive?: boolean;
+  variant?: 'default' | 'liquid';
   style?: React.CSSProperties;
 }
 
@@ -15,6 +16,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   onClick,
   elevation = 1,
   interactive = true,
+  variant = 'default',
   style = {},
 }) => {
   return (
@@ -23,6 +25,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       style={style}
       className={`
         glass-card
+        ${variant === 'liquid' ? 'liquid-glass' : ''}
         ${interactive ? 'liquid-interactive liquid-shimmer cursor-pointer' : ''}
         ${className}
       `}
