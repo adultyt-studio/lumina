@@ -3,8 +3,7 @@ import { useDesignStore } from '../store/designStore';
 import { Sparkles, ZoomIn, ZoomOut, Moon, Sun, Smartphone } from 'lucide-react';
 
 export const Header: React.FC = () => {
-  const { zoom, setZoom, isLowEndMode } = useDesignStore();
-  const [darkMode, setDarkMode] = React.useState(false);
+  const { zoom, setZoom, darkMode, toggleDarkMode } = useDesignStore();
 
   return (
     <header className="h-16 px-4 z-40 relative flex items-center justify-between border-b border-white/20 backdrop-blur-xl bg-white/10 dark:bg-slate-900/60 text-white">
@@ -53,7 +52,7 @@ export const Header: React.FC = () => {
         </div>
 
         <button
-          onClick={() => setDarkMode(!darkMode)}
+          onClick={toggleDarkMode}
           className="p-2 rounded-xl bg-black/20 text-white hover:bg-white/20 transition border border-white/20"
         >
           {darkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4" />}

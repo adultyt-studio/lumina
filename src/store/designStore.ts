@@ -33,6 +33,8 @@ interface DesignState {
   setCurrentTimeMs: (timeMs: number) => void;
 
   // Global Engine Actions
+  darkMode: boolean;
+  toggleDarkMode: () => void;
   setZoom: (zoom: number) => void;
   toggleLowEndMode: () => void;
   loadProjectData: (frames: Frame[]) => void;
@@ -126,6 +128,8 @@ export const useDesignStore = create<DesignState>((set) => ({
   isLowEndMode: false,
   isPlayingAnimation: false,
   currentTimeMs: 0,
+  darkMode: false,
+  toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
 
   addFrame: (custom) =>
     set((state) => {
