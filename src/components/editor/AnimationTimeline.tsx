@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDesignStore } from '../../store/designStore';
-import { Play, Pause, Plus, Film, Clock } from 'lucide-react';
+import { Play, Pause, Plus, Film, Clock, RotateCcw, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 
 export const AnimationTimeline: React.FC = () => {
   const {
@@ -13,6 +13,8 @@ export const AnimationTimeline: React.FC = () => {
     addKeyframe,
     updateElementAnimation,
   } = useDesignStore();
+
+  const [isExpanded, setIsExpanded] = useState(true);
 
   let selectedElement: any = null;
   for (const frame of frames) {
@@ -66,91 +68,126 @@ export const AnimationTimeline: React.FC = () => {
     requestAnimationFrame(animateLoop);
   };
 
+  // Generate timeline ticks (every 250ms)
+  const ticksCount = 6;
+  const tickInterval = Math.round(animation.duration / ticksCount);
+  const ticks = Array.from({ length: ticksCount + 1 }, (_, i) => i * tickInterval);
+
   return (
-    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-30 max-w-lg w-[92vw]">
-      <div className="glass-panel p-3 shadow-2xl border border-white/40 backdrop-blur-xl">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-2 border-b border-white/20 text-xs">
-          <div className="flex items-center gap-2 font-bold text-white">
-            <Film className="w-4 h-4 text-pink-300" />
-            <span>Animation Timeline ({selectedElement.name})</span>
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-2xl border-t border-white/20 text-white shadow-2xl transition-all duration-300 select-none">
+      {/* Timeline Dock Header */}
+      <div className="px-4 py-2 border-b border-white/10 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 font-extrabold text-xs text-white">
+            <Film className="w-4 h-4 text-pink-400" />
+            <span>Timeline Editor</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+              {selectedElement.name}
+            </span>
           </div>
-          <div className="flex items-center gap-1 font-mono text-white/80 text-[11px]">
-            <Clock className="w-3 h-3 text-amber-300" />
-            <span>{currentTimeMs}ms / {animation.duration}ms</span>
-          </div>
-        </div>
 
-        {/* Timeline Scrubber Track */}
-        <div className="py-2 relative">
-          <input
-            type="range"
-            min={0}
-            max={animation.duration}
-            value={currentTimeMs}
-            onChange={(e) => setCurrentTimeMs(Number(e.target.value))}
-            className="w-full accent-pink-500 cursor-pointer"
-          />
-
-          {/* Keyframe Diamond Markers */}
-          <div className="relative w-full h-4 mt-1 bg-black/20 rounded-lg overflow-hidden">
-            {animation.keyframes.map((kf: any, i: number) => {
-              const posPercent = (kf.time / animation.duration) * 100;
-              return (
-                <button
-                  key={i}
-                  onClick={() => setCurrentTimeMs(kf.time)}
-                  style={{ left: `${Math.min(95, posPercent)}%` }}
-                  className="absolute top-1/2 -translate-y-1/2 text-amber-300 text-xs hover:scale-125 transition font-bold"
-                  title={`Keyframe at ${kf.time}ms`}
-                >
-                  ◆
-                </button>
-              );
-            })}
+          <div className="hidden sm:flex items-center gap-2 text-[11px] text-white/70 font-mono">
+            <Clock className="w-3.5 h-3.5 text-amber-300" />
+            <span>
+              {currentTimeMs}ms / {animation.duration}ms
+            </span>
           </div>
         </div>
 
-        {/* Playback & Action Controls */}
-        <div className="flex items-center justify-between pt-1 text-xs">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-1 rounded-lg text-white/70 hover:bg-white/20 transition flex items-center gap-1 text-xs font-semibold"
+          >
+            <span>{isExpanded ? 'Collapse Timeline' : 'Expand Timeline'}</span>
+            {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Full Width Motion Scrubber & Keyframe Track */}
+      {isExpanded && (
+        <div className="px-6 py-4 flex flex-col md:flex-row items-stretch gap-6">
+          {/* Controls Bar */}
+          <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={handlePlayToggle}
-              className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition ${
+              className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg transition active:scale-95 ${
                 isPlayingAnimation
-                  ? 'bg-amber-500 text-white shadow-md'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-indigo-600 hover:bg-indigo-700 text-white border border-white/30'
               }`}
             >
-              {isPlayingAnimation ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              <span>{isPlayingAnimation ? 'Pause' : 'Play'}</span>
+              {isPlayingAnimation ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              <span>{isPlayingAnimation ? 'Pause' : 'Play Motion'}</span>
             </button>
 
             <button
               onClick={() => addKeyframe(selectedElement.id, currentTimeMs)}
-              className="px-3 py-1.5 rounded-xl bg-white/20 text-white font-semibold flex items-center gap-1.5 hover:bg-white/30 transition"
+              className="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-semibold text-xs border border-emerald-500/40 flex items-center gap-1.5 transition active:scale-95"
             >
-              <Plus className="w-3.5 h-3.5 text-emerald-300" />
-              <span>+ Keyframe</span>
+              <Plus className="w-4 h-4" />
+              <span>Add Keyframe</span>
             </button>
+
+            <div className="flex items-center gap-1.5 text-xs text-white/80">
+              <label className="font-semibold text-[11px]">Duration (ms):</label>
+              <input
+                type="number"
+                step={100}
+                min={500}
+                max={10000}
+                value={animation.duration}
+                onChange={(e) =>
+                  updateElementAnimation(selectedElement.id, { duration: Number(e.target.value) })
+                }
+                className="w-20 px-2 py-1 rounded-lg bg-black/40 border border-white/30 font-mono text-center text-xs text-white focus:outline-none"
+              />
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <label className="text-white/80 font-semibold text-[11px]">Duration:</label>
-            <input
-              type="number"
-              step={100}
-              min={500}
-              max={10000}
-              value={animation.duration}
-              onChange={(e) =>
-                updateElementAnimation(selectedElement.id, { duration: Number(e.target.value) })
-              }
-              className="w-16 px-2 py-1 rounded-lg bg-black/30 border border-white/30 text-white font-mono text-center text-xs focus:outline-none"
-            />
+          {/* Timeline Track Ruler & Keyframe Markers */}
+          <div className="flex-1 flex flex-col justify-center gap-2">
+            {/* Scrubber Input Bar */}
+            <div className="relative w-full">
+              <input
+                type="range"
+                min={0}
+                max={animation.duration}
+                value={currentTimeMs}
+                onChange={(e) => setCurrentTimeMs(Number(e.target.value))}
+                className="w-full accent-pink-500 cursor-pointer h-2 bg-slate-800 rounded-lg"
+              />
+
+              {/* Ticks Scale Labels */}
+              <div className="flex justify-between text-[10px] text-white/50 font-mono pt-1">
+                {ticks.map((t, idx) => (
+                  <span key={idx}>{t}ms</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Keyframe Diamonds Track */}
+            <div className="relative w-full h-7 bg-white/5 rounded-xl border border-white/10 flex items-center overflow-hidden">
+              {/* Keyframe Markers */}
+              {animation.keyframes.map((kf: any, i: number) => {
+                const posPercent = (kf.time / animation.duration) * 100;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentTimeMs(kf.time)}
+                    style={{ left: `${Math.min(97, posPercent)}%` }}
+                    className="absolute -translate-x-1/2 p-1 text-amber-300 text-sm hover:scale-150 transition font-bold drop-shadow-md"
+                    title={`Keyframe at ${kf.time}ms (x:${kf.properties?.x}, y:${kf.properties?.y})`}
+                  >
+                    ◆
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -1,14 +1,40 @@
 import React, { useState } from 'react';
 import { useDesignStore } from '../../store/designStore';
-import { Sparkles, Type, Square, Image, Lock, Unlock, Trash2, Layers, GripVertical, ChevronDown, ChevronRight } from 'lucide-react';
+import { Sparkles, Type, Square, Image, Lock, Unlock, Trash2, Layers, GripVertical, ChevronDown, ChevronRight, Move } from 'lucide-react';
 import type { ElementType } from '../../types/design';
 
 export const LayerPanel: React.FC = () => {
   const { frames, activeFrameId, selectedElementId, setSelectedElement, reorderElement, toggleLock, deleteElement } = useDesignStore();
   const [isOpen, setIsOpen] = useState(true);
 
+  // Draggable Floating Panel State
+  const [panelPos, setPanelPos] = useState<{ x: number; y: number }>({ x: 20, y: 140 });
+  const [isDraggingPanel, setIsDraggingPanel] = useState(false);
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
   const activeFrame = frames.find((f) => f.id === activeFrameId) || frames[0];
   if (!activeFrame) return null;
+
+  const handleHeaderPointerDown = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    setIsDraggingPanel(true);
+    setDragOffset({
+      x: e.clientX - panelPos.x,
+      y: e.clientY - panelPos.y,
+    });
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingPanel) return;
+    setPanelPos({
+      x: Math.max(10, Math.min(window.innerWidth - 300, e.clientX - dragOffset.x)),
+      y: Math.max(70, Math.min(window.innerHeight - 300, e.clientY - dragOffset.y)),
+    });
+  };
+
+  const handlePointerUp = () => {
+    setIsDraggingPanel(false);
+  };
 
   const getIconForType = (type: ElementType) => {
     switch (type) {
@@ -26,26 +52,38 @@ export const LayerPanel: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-4 left-4 z-30 w-72 max-w-[calc(100vw-2rem)]">
+    <div
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      style={{ left: `${panelPos.x}px`, top: `${panelPos.y}px` }}
+      className="fixed z-30 w-72 max-w-[calc(100vw-2rem)] shadow-2xl select-none"
+    >
       <div className="glass-panel p-3 shadow-2xl border border-white/40 backdrop-blur-xl">
-        {/* Panel Header */}
+        {/* Draggable Panel Header */}
         <div
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-between cursor-pointer select-none pb-2 border-b border-white/20"
+          onPointerDown={handleHeaderPointerDown}
+          className="flex items-center justify-between cursor-grab active:cursor-grabbing pb-2 border-b border-white/20"
         >
           <div className="flex items-center gap-2">
+            <Move className="w-3.5 h-3.5 text-indigo-300" />
             <Layers className="w-4 h-4 text-indigo-300" />
             <span className="font-bold text-xs text-white">Layers</span>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200">
               {activeFrame.elements.length}
             </span>
           </div>
-          {isOpen ? <ChevronDown className="w-4 h-4 text-white/70" /> : <ChevronRight className="w-4 h-4 text-white/70" />}
+
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-1 text-white/70 hover:text-white rounded-lg transition"
+          >
+            {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          </button>
         </div>
 
         {/* Layer Stack Items */}
         {isOpen && (
-          <div className="mt-2 space-y-1.5 max-h-60 overflow-y-auto pr-1">
+          <div className="mt-2 space-y-1.5 max-h-64 overflow-y-auto pr-1 scrollbar-none">
             {activeFrame.elements.length === 0 ? (
               <div className="text-center py-4 text-xs text-white/60 font-medium">
                 No layers in frame. Click + to add.
@@ -70,7 +108,7 @@ export const LayerPanel: React.FC = () => {
                       p-2 rounded-xl flex items-center justify-between gap-2 text-xs font-semibold cursor-pointer transition-all
                       ${
                         isSelected
-                          ? 'bg-indigo-600/80 text-white shadow-md border border-white/40'
+                          ? 'bg-indigo-600/90 text-white shadow-md border border-white/40'
                           : 'bg-white/10 text-white/90 hover:bg-white/20'
                       }
                       ${el.locked ? 'opacity-60' : ''}
