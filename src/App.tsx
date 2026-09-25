@@ -1,4 +1,5 @@
 import React from 'react';
+import './styles/index.css';
 import './styles/glassmorphism.css';
 import './styles/liquid-animation.css';
 import { useLuminaStore } from './store/useLuminaStore';
