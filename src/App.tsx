@@ -2,30 +2,34 @@ import React from 'react';
 import './styles/index.css';
 import './styles/glassmorphism.css';
 import './styles/liquid-animation.css';
-import { useLuminaStore } from './store/useLuminaStore';
+import { useDesignStore } from './store/designStore';
 import { Header } from './components/Header';
-import { GlassCanvas } from './components/GlassCanvas';
+import { Canvas } from './components/editor/Canvas';
+import { Toolbar } from './components/editor/Toolbar';
+import { LayerPanel } from './components/editor/LayerPanel';
+import { PropertiesPanel } from './components/editor/PropertiesPanel';
+import { AnimationTimeline } from './components/editor/AnimationTimeline';
 import { PerformanceProfiler } from './components/PerformanceProfiler';
-import { GlassInspector } from './components/GlassInspector';
-import { GlassToolbar } from './components/GlassToolbar';
 
 export const App: React.FC = () => {
-  const { isLowEndMode, darkMode } = useLuminaStore();
+  const { isLowEndMode, darkMode } = useDesignStore();
 
   return (
     <div className={`min-h-screen relative overflow-hidden ${darkMode ? 'dark bg-slate-950 text-white' : 'text-slate-900'} ${isLowEndMode ? 'low-end-mode' : ''}`}>
-      {/* Background Ambient Orbs for Glass Depth */}
+      {/* Background Ambient Glowing Orbs */}
       <div className="bg-orb orb-1" />
       <div className="bg-orb orb-2" />
       <div className="bg-orb orb-3" />
 
-      {/* Glass UI Studio Elements */}
+      {/* Lumina Figma-Style Studio Layout */}
       <Header />
       <main className="relative z-10">
+        <Toolbar />
         <PerformanceProfiler />
-        <GlassInspector />
-        <GlassCanvas />
-        <GlassToolbar />
+        <LayerPanel />
+        <AnimationTimeline />
+        <PropertiesPanel />
+        <Canvas />
       </main>
     </div>
   );

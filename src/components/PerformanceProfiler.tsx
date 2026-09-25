@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useLuminaStore } from '../store/useLuminaStore';
+import { useDesignStore } from '../store/designStore';
 import { FpsLimiter } from '../utils/fpsLimiter';
 import { getPerformanceMetrics, PerfMetrics } from '../utils/performanceMonitor';
 import { Activity, Zap, Cpu, HardDrive, ShieldCheck, Gauge } from 'lucide-react';
 
 export const PerformanceProfiler: React.FC = () => {
-  const { isLowEndMode, toggleLowEndMode, fpsCap, updatePerformanceStats } = useLuminaStore();
+  const { isLowEndMode, toggleLowEndMode } = useDesignStore();
+  const fpsCap = isLowEndMode ? 30 : 60;
+
   const [metrics, setMetrics] = useState<PerfMetrics>({
     fps: 60,
     frameTimeMs: 4.2,
@@ -25,7 +27,6 @@ export const PerformanceProfiler: React.FC = () => {
       if (now - startTime >= 1000) {
         const m = getPerformanceMetrics(frames, now - startTime);
         setMetrics(m);
-        updatePerformanceStats(m.fps, m.frameTimeMs);
         frames = 0;
         startTime = now;
       }
@@ -33,20 +34,20 @@ export const PerformanceProfiler: React.FC = () => {
 
     limiter.start();
     return () => limiter.stop();
-  }, [fpsCap, updatePerformanceStats]);
+  }, [fpsCap]);
 
-  const fpsColor = metrics.fps >= 50 ? 'text-emerald-500' : metrics.fps >= 28 ? 'text-amber-500' : 'text-rose-500';
+  const fpsColor = metrics.fps >= 50 ? 'text-emerald-400' : metrics.fps >= 28 ? 'text-amber-400' : 'text-rose-400';
 
   return (
     <div className="fixed top-20 left-4 z-30 max-w-xs">
-      <div className="glass-panel p-3 shadow-xl border border-white/50 backdrop-blur-xl">
+      <div className="glass-panel p-3 shadow-xl border border-white/40 backdrop-blur-xl text-white">
         {/* Header HUD Bar */}
         <div className="flex items-center justify-between gap-3">
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-2 font-bold text-xs text-slate-800 hover:text-slate-900"
+            className="flex items-center gap-2 font-bold text-xs text-white hover:text-white/80"
           >
-            <Gauge className="w-4 h-4 text-indigo-600" />
+            <Gauge className="w-4 h-4 text-indigo-300" />
             <span>Perf Profiler</span>
             <span className={`font-mono font-black text-sm ${fpsColor}`}>
               {metrics.fps} FPS
@@ -61,7 +62,7 @@ export const PerformanceProfiler: React.FC = () => {
               ${
                 isLowEndMode
                   ? 'bg-amber-500 text-white shadow-md'
-                  : 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/30'
+                  : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
               }
             `}
           >
@@ -72,36 +73,36 @@ export const PerformanceProfiler: React.FC = () => {
 
         {/* Detailed Metrics Breakdown */}
         {expanded && (
-          <div className="mt-3 pt-3 border-t border-slate-200/50 space-y-2 text-[11px] animate-in fade-in duration-200">
-            <div className="flex justify-between items-center text-slate-600">
+          <div className="mt-3 pt-3 border-t border-white/20 space-y-2 text-[11px] animate-in fade-in duration-200 text-white/90">
+            <div className="flex justify-between items-center">
               <span className="flex items-center gap-1 font-medium">
-                <Cpu className="w-3.5 h-3.5 text-indigo-500" /> Frame Render Time
+                <Cpu className="w-3.5 h-3.5 text-indigo-300" /> Frame Render Time
               </span>
-              <span className="font-mono font-bold text-slate-900">{metrics.frameTimeMs} ms</span>
+              <span className="font-mono font-bold text-white">{metrics.frameTimeMs} ms</span>
             </div>
 
-            <div className="flex justify-between items-center text-slate-600">
+            <div className="flex justify-between items-center">
               <span className="flex items-center gap-1 font-medium">
-                <Activity className="w-3.5 h-3.5 text-indigo-500" /> Active DOM Nodes
+                <Activity className="w-3.5 h-3.5 text-indigo-300" /> Active DOM Nodes
               </span>
-              <span className="font-mono font-bold text-slate-900">{metrics.domNodeCount}</span>
+              <span className="font-mono font-bold text-white">{metrics.domNodeCount}</span>
             </div>
 
-            <div className="flex justify-between items-center text-slate-600">
+            <div className="flex justify-between items-center">
               <span className="flex items-center gap-1 font-medium">
-                <HardDrive className="w-3.5 h-3.5 text-indigo-500" /> Heap Memory
+                <HardDrive className="w-3.5 h-3.5 text-indigo-300" /> Heap Memory
               </span>
-              <span className="font-mono font-bold text-slate-900">{metrics.estimatedMemoryMb} MB</span>
+              <span className="font-mono font-bold text-white">{metrics.estimatedMemoryMb} MB</span>
             </div>
 
-            <div className="flex justify-between items-center text-slate-600">
+            <div className="flex justify-between items-center">
               <span className="flex items-center gap-1 font-medium">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> Bundle Size (&lt;200KB)
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Bundle Size (&lt;200KB)
               </span>
-              <span className="font-mono font-bold text-emerald-600">{metrics.bundleSizeKb} KB</span>
+              <span className="font-mono font-bold text-emerald-300">{metrics.bundleSizeKb} KB</span>
             </div>
 
-            <div className="mt-2 p-2 rounded-xl bg-indigo-50/80 border border-indigo-100 text-[10px] text-indigo-900 leading-tight">
+            <div className="mt-2 p-2 rounded-xl bg-white/10 border border-white/20 text-[10px] text-white/90 leading-tight">
               <strong>Optimization Active:</strong> {isLowEndMode ? 'Backdrop blur disabled, RAF locked to 30fps for Android 5.0+' : 'Hardware GPU accelerated glass blur & liquid spring motion active.'}
             </div>
           </div>
